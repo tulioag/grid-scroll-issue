@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+
+    <title>vaadin-grid</title>
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="bower_components/vaadin-grid/vaadin-grid.html">
+    <link rel="import" href="bower_components/vaadin-grid/vaadin-grid-tree-column.html">
+
+    <style>
+      body,
+      html {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+      <vaadin-grid style="width: 200px; height: 500px;">
+        <vaadin-grid-tree-column path="name" header="foo" item-has-children-path="hasChildren"></vaadin-grid-tree-column>
+      </vaadin-grid>
+    <script>
+        window.addEventListener('WebComponentsReady', () => {
+
+          const grid = document.getElementsByTagName("vaadin-grid")[0];
+          grid.size = 0; 
+          grid.itemIdPath = 'name';
+          grid.dataProvider = ({page, parentItem}, cb) => {
+            setTimeout(() => {
+              if(!parentItem) {
+                cb([{name: "PARENT", hasChildren:true}],1);
+                return;
+              }
+              const scope = parentItem.name;
+              const numberOfItems = grid.pageSize * 5;
+              const offset = page * grid.pageSize
+              cb([...new Array(grid.pageSize)].map((_, index) => {
+                return {name: 'Child ' + (offset+index),hasChildren:false};
+              }), numberOfItems);
+            });
+          };
+          grid.expandedItems = [{name:"PARENT"}];
+          grid.scrollToIndex(250);
+        });
+    </script>
+  </body>
+</html>
